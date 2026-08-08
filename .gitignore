@@ -4,9 +4,10 @@ target/
 *.iml
 *.log
 application-local.properties
-.mvn/
-mvnw
-mvnw.cmd
 .classpath
 .project
 .settings/
+__pycache__/
+*.py[cod]
+*.pdf
+bin/

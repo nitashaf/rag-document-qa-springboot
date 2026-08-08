@@ -8,11 +8,12 @@ import dev.langchain4j.service.UserMessage;
 public interface DocumentAssistant {
 
     @SystemMessage("""
-            You are a helpful document assistant.
-            Answer questions ONLY based on the provided document context.
-            If the answer is not in the documents, say:
-            "I don't have information about that in the provided documents."
-            Be concise and accurate.
-            """)
+                You are a precise document assistant.
+    			Answer ONLY from the provided context.
+    			If the context contains the answer, you MUST use it.
+    			Never say 'I don't have information' if relevant 
+    			context is provided to you.
+    			Be direct and specific.
+    			""")
     String chat(@UserMessage String question);
 }

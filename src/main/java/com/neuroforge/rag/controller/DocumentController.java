@@ -5,6 +5,9 @@ import com.neuroforge.rag.model.ChatRequest;
 import com.neuroforge.rag.model.ChatResponse;
 import com.neuroforge.rag.model.TextIngestRequest;
 import com.neuroforge.rag.service.DocumentService;
+import dev.langchain4j.rag.content.Content;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.query.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -22,6 +26,7 @@ public class DocumentController {
 
     private final DocumentAssistant assistant;
     private final DocumentService documentService;
+    private final ContentRetriever contentRetriever;
 
     @PostMapping("/documents/upload")
     public ResponseEntity<String> uploadDocument(
@@ -46,9 +51,14 @@ public class DocumentController {
     public ResponseEntity<ChatResponse> chat(
             @RequestBody ChatRequest request) {
         log.info("Question: {}", request.getQuestion());
+        List<String> contexts = contentRetriever.retrieve(Query.from(request.getQuestion()))
+                .stream()
+                .map(Content::textSegment)
+                .map(segment -> segment.text())
+                .toList();
         String answer = assistant.chat(request.getQuestion());
         return ResponseEntity.ok(
-            new ChatResponse(request.getQuestion(), answer, LocalDateTime.now())
+            new ChatResponse(request.getQuestion(), answer, contexts, LocalDateTime.now())
         );
     }
 

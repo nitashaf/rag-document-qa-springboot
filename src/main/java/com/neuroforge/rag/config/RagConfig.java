@@ -10,6 +10,8 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import org.springframework.context.annotation.Primary;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 
 @Configuration
 public class RagConfig {
@@ -28,9 +30,20 @@ public class RagConfig {
 	public EmbeddingStoreIngestor ingestor(EmbeddingModel embeddingModel,
 	                                       EmbeddingStore<TextSegment> embeddingStore) {
 	    return EmbeddingStoreIngestor.builder()
-	            .documentSplitter(DocumentSplitters.recursive(500, 50))
+	            .documentSplitter(DocumentSplitters.recursive(400, 80))
 	            .embeddingModel(embeddingModel)
 	            .embeddingStore(embeddingStore)
+	            .build();
+	}
+	
+	@Bean
+	public ContentRetriever contentRetriever(EmbeddingStore<TextSegment> embeddingStore,
+	                                         EmbeddingModel embeddingModel) {
+	    return EmbeddingStoreContentRetriever.builder()
+	            .embeddingStore(embeddingStore)
+	            .embeddingModel(embeddingModel)
+	            .maxResults(5)
+	            .minScore(0.55)
 	            .build();
 	}
 
